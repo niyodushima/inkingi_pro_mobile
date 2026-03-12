@@ -2,32 +2,36 @@ name: Flutter Web Deploy
 
 on:
   push:
-    branches: [ main ]
-
-permissions:
-  contents: write   # allow pushing to gh-pages
+    branches:
+      - main
+  pull_request:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      # Checkout source code
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Set up Flutter
+      # Install Flutter (match your local version!)
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.41.4'
+          flutter-version: '3.19.0'   # Replace with your local flutter --version
 
+      # Install dependencies
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build web
-        run: flutter build web
+      # Build web app
+      - name: Build Flutter web
+        run: flutter build web --release
 
-      - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v3
+      # Upload build artifacts (optional, useful for debugging)
+      - name: Upload web build
+        uses: actions/upload-artifact@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: build/web
-          publish_branch: gh-pages
+          name: web-build
+          path: build/web
